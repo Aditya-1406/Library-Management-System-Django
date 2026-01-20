@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from .models import Member
 from django.contrib import messages
+from .decorators import login_required_custom,admin_required
 # Create your views here.
 
 
@@ -61,11 +62,12 @@ def login(request):
     
     return render(request,'login.html')
 
+@login_required_custom
 def logout(request):
     request.session.flush()
     return redirect('login')
 
-
+@login_required_custom
 def update(request):
     mem_id = request.session.get("member_id")
 
@@ -90,7 +92,7 @@ def update(request):
         
     return render(request,'update.html',{'mem':mem})
     
-
+@admin_required
 def delete(request):
 
 
@@ -127,13 +129,28 @@ def delete(request):
 
    return render(request,'delete.html')
    
-
+@admin_required
 def alluser(request):
-    if request.session.get('role')!= 'admin':
-        messages.error(request,"Only admin can access this feature")
+    if request.session.get('role') != 'admin':
+        messages.error(request, "Only admin can access this feature")
         return redirect('login')
+
     users = Member.objects.all().order_by('role')
-    return render(request,'alluser.html',{'users':users})
+
+    if request.method == 'POST':
+        search = request.POST.get('search', '').strip()
+
+        if search:
+            users = Member.objects.filter(
+                email__icontains=search
+            ) | Member.objects.filter(
+                name__icontains=search
+            )
+
+            if not users.exists():
+                messages.error(request, "User does not exist")
+
+    return render(request, 'alluser.html', {'users': users})
 
 def updaterole(request,id):
     if request.session.get('role')!= 'admin':
@@ -147,10 +164,16 @@ def updaterole(request,id):
         return redirect('alluser')
     if request.method == 'POST':
         data = request.POST
-
+        name = data.get('name')
+        contact = data.get('contact')
         role = data.get('role')
         mem.role = role
+        mem.name = name
+        mem.contact = contact
         mem.save()
+        request.session.role = role
+        request.session.name = name 
+
         messages.success(request,"User Role Updated Successfully")
         return redirect('alluser')
     return render(request,'updaterole.html',{'mem':mem})
