@@ -65,3 +65,92 @@ def logout(request):
     request.session.flush()
     return redirect('login')
 
+
+def update(request):
+    mem_id = request.session.get("member_id")
+
+    try:
+        mem = Member.objects.get(id=mem_id)
+    except Exception as e:
+        return redirect('login')
+    
+    if request.method == 'POST':
+            data = request.POST
+
+            name = data.get('name')
+            contact = data.get('contact')
+            email = data.get('email')
+
+            mem.name = name
+            mem.contact = contact 
+            mem.email = email
+            mem.save()
+            messages.success(request,"Profile Updated Successfully")
+            return redirect('login')
+        
+    return render(request,'update.html',{'mem':mem})
+    
+
+def delete(request):
+
+
+   role = request.session.get('role')
+   if role != 'admin':
+       messages.error(request,"Only admin can access this feature")
+       return redirect('login')
+   if request.method == 'POST':
+        data = request.POST
+        user_id = data.get('name')
+        email = data.get('email')
+
+        if user_id:
+            try:
+                user = Member.objects.get(id=user_id)
+                user.delete()
+                messages.success(request,"User Deleted Successfully")
+                return redirect('login')
+            except Member.DoesNotExist:
+                messages.error(request,"User with this ID does not exits")
+                return redirect('login')
+
+        elif email:
+            try:
+                user = Member.objects.get(email=email)
+                user.delete()
+                messages.success(request,"User Deleted Successfully")
+                return redirect('login')
+            except Member.DoesNotExist:
+                messages.error(request,"User with this ID does not exits")
+                return redirect('login')    
+
+   
+
+   return render(request,'delete.html')
+   
+
+def alluser(request):
+    if request.session.get('role')!= 'admin':
+        messages.error(request,"Only admin can access this feature")
+        return redirect('login')
+    users = Member.objects.all().order_by('role')
+    return render(request,'alluser.html',{'users':users})
+
+def updaterole(request,id):
+    if request.session.get('role')!= 'admin':
+        messages.error(request,"Only admin can access this feature")
+        return redirect('login')
+    
+    try:
+        mem= Member.objects.get(id=id)
+    except Member.DoesNotExist:
+        messages.error(request,"User does not exists")
+        return redirect('alluser')
+    if request.method == 'POST':
+        data = request.POST
+
+        role = data.get('role')
+        mem.role = role
+        mem.save()
+        messages.success(request,"User Role Updated Successfully")
+        return redirect('alluser')
+    return render(request,'updaterole.html',{'mem':mem})

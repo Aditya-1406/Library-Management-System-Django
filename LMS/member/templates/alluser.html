@@ -1,0 +1,38 @@
+{%extends 'base.html'%}
+
+{%block title%} All Users {%endblock%}
+
+{%block content%}
+<div class="container mt-5">
+<h1> All Users</h1>
+
+<hr>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Contact</th>
+      <th scope="col">Email</th>
+      <th scope="col">Role</th>
+      <th scope="col">Update Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users%}
+    <tr>
+    
+      <th scope="row">{{forloop.counter}}</th>
+      <td>{{user.name}}</td>
+      <td>{{user.contact}}</td>
+      <td>{{user.email}}</td>
+      <td>{{user.role}}</td>
+      <td><button><a href="/updaterole/{{user.id}}">Update Role</a></button>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+</div>
+
+{%endblock%}

@@ -1,0 +1,27 @@
+{%extends 'base.html'%}
+
+{%block title%} Delete User {%endblock%}
+
+{%block content%}
+<div class="container mt-5">
+<form method="post">
+    {%csrf_token%}
+
+    <h1> Delete User </h1>
+    <hr>
+
+  <div class="mb-3">
+    <input type="number" class="form-control" name="name" placeholder="Enter user id">
+  </div>
+
+  <div class="mb-3">
+    <input type="email" class="form-control" name="email" placeholder="Enter user email" >
+  </div>
+  
+  <button type="submit" class="btn btn-primary">Delete</button>
+</form>
+
+
+</div>
+
+{%endblock%}
