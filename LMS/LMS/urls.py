@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from member.views import signup,login,logout,update,delete,alluser,updaterole
+from django.conf import settings
+from django.conf.urls.static import static
+from book.views import add_book
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +29,6 @@ urlpatterns = [
     path('update/',update,name='update'),
     path('delete/',delete,name='delete'),
     path('alluser/',alluser,name='alluser'),
-    path('updaterole/<int:id>/',updaterole,name='updaterole')
-]
+    path('updaterole/<int:id>/',updaterole,name='updaterole'),
+    path('addbook/',add_book,name='addbook')
+]+  static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
