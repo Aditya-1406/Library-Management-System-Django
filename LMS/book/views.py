@@ -39,3 +39,30 @@ def add_book(request):
         return redirect('addbook')
 
     return render(request,'add.html')
+
+
+def update_book(request,id):
+    try:
+        book = Book.objects.get(id=id)
+    except Book.DoesNotExist:
+        messages.error(request, "Book not found")
+        return redirect("updatebook", id=id)
+
+    if request.method == "POST":
+        data = request.POST
+        available_copies = data.get('available_copies')
+        photo = request.FILES.get('photo')
+
+        if int(available_copies) < 0:
+            messages.error(request, "Available copies cannot be negative")
+            return redirect("updatebook", id=id)
+
+        book.available_copies = available_copies
+        if photo:
+            book.photo = photo
+        book.save()
+
+        messages.success(request, "Book updated successfully")
+        return redirect("updatebook", id=id)
+
+    return render(request, 'updatebook.html', {'book': book})
