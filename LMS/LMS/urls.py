@@ -19,7 +19,7 @@ from django.urls import path
 from member.views import signup,login,logout,update,delete,alluser,updaterole
 from django.conf import settings
 from django.conf.urls.static import static
-from book.views import add_book,update_book
+from book.views import add_book,update_book,allbook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,5 +31,6 @@ urlpatterns = [
     path('alluser/',alluser,name='alluser'),
     path('updaterole/<int:id>/',updaterole,name='updaterole'),
     path('addbook/',add_book,name='addbook'),
-    path('updatebook/<int:id>/',update_book,name='updatebook')
+    path('updatebook/<int:id>/',update_book,name='updatebook'),
+    path('allbook/',allbook,name='allbook'),
 ]+  static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

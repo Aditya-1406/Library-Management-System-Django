@@ -66,3 +66,26 @@ def update_book(request,id):
         return redirect("updatebook", id=id)
 
     return render(request, 'updatebook.html', {'book': book})
+
+
+def allbook(request):
+    if request.session.get('role') != 'admin':
+        messages.error(request, "Only admin can access this feature")
+        return redirect('login')
+
+    books = Book.objects.all().order_by('title')
+
+    if request.method == 'POST':
+        search = request.POST.get('search', '').strip()
+
+        if search:
+            books = Book.objects.filter(
+                title__icontains=search
+            ) | Book.objects.filter(
+                author__icontains=search
+            )
+
+            if not books.exists():
+                messages.error(request, "User does not exist")
+
+    return render(request, 'listbook.html', {'books': books})
