@@ -32,33 +32,42 @@ class Transaction(models.Model):
         return Decimal("0.00")
 
     def save(self, *args, **kwargs):
-        # Atomic transaction to avoid race condition
         with transaction.atomic():
-            if not self.pk:  # new transaction
-                # Lock book row for update (prevents negative copies)
-                book = type(self.book).objects.select_for_update().get(pk=self.book.pk)
 
-                if book.available_copies <= 0:
+        # get old returned_at value (before update)
+            old_returned_at = None
+            if self.pk:
+                old_returned_at = Transaction.objects.get(pk=self.pk).returned_at
+
+        # 🔻 BORROW LOGIC (when transaction is created)
+            if self.pk is None:
+                if self.book.available_copies <= 0:
                     raise ValueError("No copies available for this book.")
+                self.book.available_copies -= 1
+                self.book.save()
 
-                book.available_copies -= 1
-                book.save()
-                self.book = book
+        # 🔺 RETURN LOGIC (when admin sets returned_at)
+            if old_returned_at is None and self.returned_at is not None:
+                self.book.available_copies += 1
+                self.book.save()
 
+        # update fine
             self.fine_amount = self.calculate_fine()
+
             super().save(*args, **kwargs)
 
-    def return_book(self):
-        if not self.returned_at:
-            with transaction.atomic():
-                self.returned_at = timezone.now()
-                self.fine_amount = self.calculate_fine()
 
-                book = type(self.book).objects.select_for_update().get(pk=self.book.pk)
-                book.available_copies += 1
-                book.save()
+    # def return_book(self):
+    #     if not self.returned_at:
+    #         with transaction.atomic():
+    #             self.returned_at = timezone.now()
+    #             self.fine_amount = self.calculate_fine()
 
-                super().save()
+    #             book = type(self.book).objects.select_for_update().get(pk=self.book.pk)
+    #             book.available_copies += 1
+    #             book.save()
+
+    #             super().save()
 
     def __str__(self):
         return f"{self.member.user.username} borrowed {self.book.title}"

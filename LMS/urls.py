@@ -20,12 +20,14 @@ from member.views import signup,login_view,logout_view
 from django.conf import settings
 from django.conf.urls.static import static
 from books.views import list_book,all_books,borrow_book
+from transaction.views import transaction_view
 
 
 urlpatterns = [
     path('',list_book,name='home'),
     path('books/',all_books,name='books'),
-     path('borrow/<int:book_id>/',borrow_book, name='borrow_book'),
+    path('transactions/',transaction_view,name='transactions'),
+    path('borrow/<int:book_id>/',borrow_book, name='borrow_book'),
     path('admin/', admin.site.urls),
     path('signup/', signup,name='signup'),
     path('login/',login_view,name='login'),
