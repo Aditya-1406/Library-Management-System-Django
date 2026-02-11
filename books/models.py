@@ -17,5 +17,14 @@ class Book(models.Model):
     available_copies = models.IntegerField(default=1)
     image = models.ImageField(upload_to='book_images/',null=True,blank=True)
 
+    
+    class Meta:
+        # default list ordering in admin and queries (you can still override in queries)
+        ordering = ("-id",)  # newest first; or use ("-id",) if no created_at
+        indexes = [
+            models.Index(fields=["-id"]),  # makes ORDER BY fast
+        ]
+
+
     def __str__(self):
         return self.title

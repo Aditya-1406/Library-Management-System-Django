@@ -11,18 +11,32 @@
 </head>
 
 <body>
-    {% if messages %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {% for message in messages %}
-        <strong>{{message}}</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        {% endfor %}
-    </div>
-    {% endif %}
+
 
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand">Innova Library</a>
+
+            {%if user.is_authenticated%}
+            <ul class="nav justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/books/">Books</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Transactions</a>
+                </li>
+                {%if user.is_superuser%}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/">Dashboard</a>
+                </li>
+                {%endif%}
+            </ul>
+            {%endif%}
+
+
             <form class="d-flex" role="search">
                 {% if user.is_authenticated %}
                 <button class="btn btn-outline-success" type="submit"><a href="/logout/">Logout</a></button>
@@ -33,7 +47,14 @@
         </div>
     </nav>
 
-
+    {% if messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% endfor %}
+    </div>
+    {% endif %}
 
 
 

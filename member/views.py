@@ -76,7 +76,7 @@ def login_view(request):
             return redirect('admin:index')
 
         messages.success(request, 'Login successful.')
-        return redirect('login')
+        return redirect('home')
 
 
     return render(request,'login.html')
