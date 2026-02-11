@@ -1,0 +1,25 @@
+{% extends 'base.html'%}
+
+{% block title%} Login Page {%endblock%}
+{%block content%}
+<div class="container mt-5" style="max-width: 500px; background-color: antiquewhite;">
+    <h3 class="pt-3"> Login </h3>
+    <hr>
+    <form method="post" class="pb-3">
+        {%csrf_token%}
+
+        <div class="mb-3">
+            <input type="email" class="form-control" name="email" placeholder="Email" required>
+        </div>
+
+        <div class="mb-3">
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+       
+        <p>Don't Have Account <a href="/signup/">Signup</a></p>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+
+{%endblock%}

@@ -3,12 +3,15 @@
 {% block title%} Signup Page {%endblock%}
 {%block content%}
 <div class="container mt-5" style="max-width: 500px; background-color: antiquewhite;">
-    <h3> Signup </h3>
+    <h3 class="pt-3"> Signup </h3>
     <hr>
     <form method="post" class="pb-3">
         {%csrf_token%}
         <div class="mb-3">
             <input type="text" class="form-control" name="first_name" placeholder="Name" required>
+        </div>
+        <div class="mb-3">
+            <input type="text" class="form-control" name="username" placeholder="Username" required>
         </div>
         <div class="mb-3">
             <input type="email" class="form-control" name="email" placeholder="Email" required>
@@ -20,7 +23,12 @@
         <div class="mb-3">
             <input type="password" class="form-control" name="password" placeholder="Password">
         </div>
-       
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="exampleCheck1" required>
+            <label class="form-check-label" for="exampleCheck1">I hereby consent that I have verified my details</label>
+        </div>
+        <p>Already Have Account <a href="/login/">Login</a></p>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
