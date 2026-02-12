@@ -63,6 +63,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -181,6 +182,7 @@ JAZZMIN_SETTINGS = {
         {"name": "Books", "url": "/admin/books/book"},
 
         {"name": "Transactions", "url": "/admin/transaction/transaction/"},
+        {"name": "Stats","url":"/admin/dashboard/"},
 
         {"name": "Site",  "url": "/#"},
         
@@ -281,3 +283,12 @@ JAZZMIN_SETTINGS = {
     },
 
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'ur_mail_id@gmail.com'
+EMAIL_HOST_PASSWORD = 'Your_app_Password'  # NOT normal password

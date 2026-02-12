@@ -1,6 +1,14 @@
 from django.contrib import admin
 from .models import Transaction
 # Register your models here.
+from django.contrib import admin
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+import json
+
+
+
+
 
 class TransAdmin(admin.ModelAdmin):
     list_display = ("id", "member", "book", "borrowed_at", "due_date","returned_at","fine_amount","fine_paid")

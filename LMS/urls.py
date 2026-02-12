@@ -21,10 +21,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from books.views import list_book,all_books,borrow_book
 from transaction.views import transaction_view
+from transaction.admin_dashboard import dashboard_view
 
 
 urlpatterns = [
     path('',list_book,name='home'),
+    path('admin/dashboard/',dashboard_view,name='admin_dashboard'),
     path('books/',all_books,name='books'),
     path('transactions/',transaction_view,name='transactions'),
     path('borrow/<int:book_id>/',borrow_book, name='borrow_book'),

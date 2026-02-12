@@ -1,0 +1,168 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<style>
+.dashboard-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    border-radius: 14px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transition: 0.3s;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+}
+.stat-label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.bg-blue { background: linear-gradient(135deg, #1e3c72, #2a5298); }
+.bg-green { background: linear-gradient(135deg, #11998e, #38ef7d); }
+.bg-orange { background: linear-gradient(135deg, #f7971e, #ffd200); }
+.bg-red { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
+
+.chart-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+</style>
+
+<div class="container-fluid">
+
+  <div class="dashboard-title">📊 Library Analytics Dashboard</div>
+
+  <!-- KPI CARDS -->
+  <div class="row g-3">
+
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card bg-blue">
+        <div class="stat-number">{{ total_members }}</div>
+        <div class="stat-label">Total Members</div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card bg-green">
+        <div class="stat-number">{{ total_books }}</div>
+        <div class="stat-label">Total Books</div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card bg-orange">
+        <div class="stat-number">{{ issued_books }}</div>
+        <div class="stat-label">Books Issued</div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card bg-red">
+        <div class="stat-number">{{ returned_books }}</div>
+        <div class="stat-label">Books Returned</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS -->
+  <div class="row mt-4 g-3">
+
+    <div class="col-xl-8 col-lg-12">
+      <div class="chart-card">
+        <div class="chart-title">📈 Monthly Transactions</div>
+        <canvas id="transactionChart" height="120"></canvas>
+      </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-12">
+      <div class="chart-card">
+        <div class="chart-title">🥧 Issued vs Returned</div>
+        <canvas id="statusChart" height="200"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+var labels = {{ labels|safe }};
+var transData = {{ trans_data|safe }};
+var statusData = {{ status_data|safe }};
+var fineData = {{ fine_data|safe }};
+
+// Line Chart
+new Chart(document.getElementById('transactionChart'), {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Transactions',
+            data: transData,
+            borderColor: '#1e3c72',
+            backgroundColor: 'rgba(30,60,114,0.15)',
+            fill: true,
+            tension: 0.4
+        },
+        {
+                label: 'Fine Revenue (₹)',
+                data: fineData,
+                borderColor: 'red',
+                fill: false,
+                tension: 0.3
+            }
+    ]
+    },
+    
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+
+// Pie Chart
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Issued', 'Returned'],
+        datasets: [{
+            data: statusData,
+            backgroundColor: ['#f7971e', '#38ef7d']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}

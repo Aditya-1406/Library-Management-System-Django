@@ -3,6 +3,8 @@ from datetime import timedelta
 from django.utils import timezone
 from decimal import Decimal
 from django.db import transaction
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 def get_default_due_date():
@@ -34,40 +36,97 @@ class Transaction(models.Model):
     def save(self, *args, **kwargs):
         with transaction.atomic():
 
-        # get old returned_at value (before update)
+            # get old returned_at value (before update)
             old_returned_at = None
             if self.pk:
                 old_returned_at = Transaction.objects.get(pk=self.pk).returned_at
 
-        # 🔻 BORROW LOGIC (when transaction is created)
-            if self.pk is None:
+            # 🔻 BORROW LOGIC (when transaction is created)
+            is_new = self.pk is None
+            if is_new:
                 if self.book.available_copies <= 0:
                     raise ValueError("No copies available for this book.")
                 self.book.available_copies -= 1
                 self.book.save()
 
-        # 🔺 RETURN LOGIC (when admin sets returned_at)
+            # 🔺 RETURN LOGIC (when admin sets returned_at)
+            is_returned_now = False
             if old_returned_at is None and self.returned_at is not None:
                 self.book.available_copies += 1
                 self.book.save()
+                is_returned_now = True
 
-        # update fine
+            # update fine
             self.fine_amount = self.calculate_fine()
 
             super().save(*args, **kwargs)
 
+            # ✅ EMAIL WHEN BOOK IS ISSUED
+            if is_new:
+                subject = "📚 Book Issued - Library Notification"
+                due_date_str = self.due_date.strftime("%d %b %Y")
 
-    # def return_book(self):
-    #     if not self.returned_at:
-    #         with transaction.atomic():
-    #             self.returned_at = timezone.now()
-    #             self.fine_amount = self.calculate_fine()
+                message = f"""
+Hi {self.member.user.username},
 
-    #             book = type(self.book).objects.select_for_update().get(pk=self.book.pk)
-    #             book.available_copies += 1
-    #             book.save()
+Your book has been successfully issued 🎉
 
-    #             super().save()
+📖 Book Name: {self.book.title}
+📅 Due Date: {due_date_str}
+
+⚠️ Fine Warning:
+A fine of ₹10 per day will be charged if the book is returned late.
+
+Please return the book on time.
+
+Library Management System 📚
+                """
+
+                send_mail(
+                    subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [self.member.user.email],
+                    fail_silently=False,
+                )
+
+            # ✅ EMAIL WHEN BOOK IS RETURNED
+            if is_returned_now:
+                subject = "✅ Book Returned - Library Notification"
+                fine = self.fine_amount
+
+                message = f"""
+Hi {self.member.user.username},
+
+Your book has been successfully returned ✅
+
+📖 Book Name: {self.book.title}
+💰 Fine Amount: ₹{fine}
+
+"""
+
+                if fine > 0:
+                    message += f"""
+⚠️ You have been charged a fine of ₹{fine}.
+Please pay the fine to the library.
+"""
+                else:
+                    message += """
+🎉 No fine charged! Thank you for returning the book on time.
+"""
+
+                message += """
+
+Library Management System 📚
+                """
+
+                send_mail(
+                    subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [self.member.user.email],
+                    fail_silently=False,
+                )
 
     def __str__(self):
         return f"{self.member.user.username} borrowed {self.book.title}"
