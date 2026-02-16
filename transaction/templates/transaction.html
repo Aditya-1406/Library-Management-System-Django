@@ -42,13 +42,19 @@ Your Transactions
                 <td>{{trans.returned_at}}</td>
                 <td>{{trans.fine_amount}}</td>
                 <td>{{trans.fine_paid}}</td>
-                {%if trans.returned_at%}
-                    {%if trans.fine_paid == False%}
-                    <td><a href="{% url 'pay' trans.id %}" class="btn btn-sm btn-primary mt-2">Pay</td>
-                    {%endif%}
-                {%else%}
-                    <td>-</td>
-                {%endif%}
+                {% if trans.fine_amount > 0 %}
+                {% if not trans.fine_paid %}
+                <td>
+                    <a href="{% url 'pay' trans.id %}" class="btn btn-sm btn-primary mt-2">
+                        Pay
+                    </a>
+                </td>
+                {% else %}
+                <td>Paid</td>
+                {% endif %}
+                {% else %}
+                <td>-</td>
+                {% endif %}
 
             </tr>
             {%endfor%}
