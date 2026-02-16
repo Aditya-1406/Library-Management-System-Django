@@ -16,23 +16,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from member.views import signup,login_view,logout_view
+from member.views import Signup,LoginView,LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
-from books.views import list_book,all_books,borrow_book
-from transaction.views import transaction_view
-from transaction.admin_dashboard import dashboard_view
+from books.views import ListBook,AllBook,BorrowBook
+from transaction.views import TransactionView
+from transaction.admin_dashboard import DashboardView
 
 
 urlpatterns = [
-    path('',list_book,name='home'),
-    path('admin/dashboard/',dashboard_view,name='admin_dashboard'),
-    path('books/',all_books,name='books'),
-    path('transactions/',transaction_view,name='transactions'),
-    path('borrow/<int:book_id>/',borrow_book, name='borrow_book'),
+    path('',ListBook.as_view(),name='home'),
+    path('admin/dashboard/',DashboardView.as_view(),name='admin_dashboard'),
+    path('books/',AllBook.as_view(),name='books'),
+    path('transactions/',TransactionView.as_view(),name='transactions'),
+    path('borrow/<int:book_id>/',BorrowBook.as_view(), name='borrow_book'),
     path('admin/', admin.site.urls),
-    path('signup/', signup,name='signup'),
-    path('login/',login_view,name='login'),
-    path('logout/',logout_view,name='logout')
+    path('signup/', Signup.as_view(),name='signup'),
+    path('login/',LoginView.as_view(),name='login'),
+    path('logout/',LogoutView.as_view(),name='logout'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -3,12 +3,19 @@ from django.contrib import messages
 from .models import Member
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.views import View
 
 
 # Create your views here.
 
-def signup(request):
-    if request.method == 'POST':
+class Signup(View):
+
+    def get(self,request):
+        return render(request,"signup.html")
+
+
+    def post(self,request):
+   
         data = request.POST
 
         first_name = data.get('first_name')
@@ -21,8 +28,17 @@ def signup(request):
         if (len(password) < 8) or (not any(char.isdigit() for char in password)) or (not any(char.isalpha() for char in password)):
             messages.error(request, 'Password must be at least 8 characters long and contain both letters and numbers.')
             return redirect('signup')
+        
+        if (len(contact) != 10):
+            messages.error(request, 'Invalid Contact Number')
+            return redirect('signup')
+        
+        if  User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already taken')
+            return redirect('signup')
 
-        user = User.objects.filter(email=email)
+
+        user = User.objects.filter(email=email) 
         if user.exists():
             messages.error(request, 'Email already registered')
             return redirect('signup')
@@ -43,10 +59,12 @@ def signup(request):
         messages.success(request,'User Created Successfully')
         return redirect('login')
 
-    return render(request, 'signup.html')
+class LoginView(View):
 
-def login_view(request):
-    if request.method == 'POST':
+    def get(self,request):
+        return render(request,'login.html')
+
+    def post(self,request):
         data = request.POST
         email = data.get('email')
         password = data.get('password')
@@ -79,9 +97,10 @@ def login_view(request):
         return redirect('home')
 
 
-    return render(request,'login.html')
 
-def logout_view(request):
-    logout(request)
-    messages.success(request, 'Logged out successfully.')
-    return redirect('login')
+class LogoutView(View):
+
+    def get(self,request):
+        logout(request)
+        messages.success(request, 'Logged out successfully.')
+        return redirect('login')
