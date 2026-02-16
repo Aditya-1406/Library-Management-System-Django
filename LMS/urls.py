@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 from books.views import ListBook,AllBook,BorrowBook
 from transaction.views import TransactionView
 from transaction.admin_dashboard import DashboardView
+from transaction.trans import  Checkout
 
 
 urlpatterns = [
@@ -34,6 +35,7 @@ urlpatterns = [
     path('signup/', Signup.as_view(),name='signup'),
     path('login/',LoginView.as_view(),name='login'),
     path('logout/',LogoutView.as_view(),name='logout'),
+    path('checkout/<int:trans_id>/',Checkout.as_view(),name='pay'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
