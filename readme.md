@@ -4,10 +4,12 @@ The Library Management System is a modern web-based application designed to auto
 This system improves workflow efficiency, reduces administrative workload, and enhances the experience for both librarians and members.
 
 ✨ Key Features
+
 📖 Book Management
-Add, update, and delete books
-Track real-time availability
-Organize books by category and author
+
+1.Add, update, and delete books
+2.Track real-time availability
+3.Organize books by category and author
 
 👤 Member Management
 Register and manage library members
